@@ -36,8 +36,10 @@ section .data
 	longMsjDif equ $ - msjDif
 	msjError db 0xA,'Usted acaba de ingresar un numero invalido!',0xA
 	longMsjError equ $ - msjError
-
-
+	val1 db 50
+	val2 db 60
+	newLine db 0xA
+	longNewLine equ $ - newLine
 section .bss
 	num1 resb 4
 	longNum1 equ $-num1
@@ -49,6 +51,8 @@ section .bss
 	longNumDif equ $-numDif
 	nuevaLinea resb 4
 
+
+
 section .text
 	global _start
 
@@ -58,6 +62,20 @@ _start:
 	input num1, longNum1
 	print msj2, longMsj2
 	input num2, longNum2
+
+	mov rax,[num1]
+	sub rax, '0'
+	mov rbx, [num2]
+	sub rbx, '0'
+
+	add rax,rbx
+	add rax,'0'
+	mov [numSuma],rax
+
+	print msjSuma,longMsjSuma
+	print numSuma,longNumSuma
+	print newLine,longNewLine
+
 	jmp _exit
 
 _exit:;Se finaliza el programa

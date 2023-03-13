@@ -14,5 +14,34 @@ myOtherVal db 60
 mov al,myVal
 add al,myOtherVal
 ===
-=======
+=======Single num addition
+num1 = 4
+mov rax, [num1]
+sub '0'
+num2 = 3
+mov rbx, [num2]
+sub rbx'0'
+
+
+
+add rax,rbx
+add rax,'0'
+mov [num3],rax
+
+===
+231
+1
+
+0
+sub '0'
+2 * (10^0)=2
+sub 2,'0'
+0+2=2
+2 * (10^1)=20
+sub 3,'0'
+20+3=23
+23 * (10^2)=230
+sub 1,'0'
+230+1=231
+
 
