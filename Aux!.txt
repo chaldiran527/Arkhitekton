@@ -1,9 +1,18 @@
 Info:
-Dos
-Due
-Zwei
-Ni
-Du
-XA
-IS
-SE
+Addition two variables direct test::::
+===
+mov al,50
+add al,60 ; AL now contains the sum 110.
+
+There are many permutations on how this might be accomplished depending on your exact requirements. For example you may need these values to be variables and thus stored in memory in which case the instructions would be similar
+
+; Variable declaration
+myVal db 50
+myOtherVal db 60
+
+; Perform addition
+mov al,myVal
+add al,myOtherVal
+===
+=======
+
