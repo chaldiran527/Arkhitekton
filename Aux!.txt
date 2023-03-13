@@ -1,4 +1,5 @@
 Info:
+<<<<<<< HEAD
 Addition two variables direct test::::
 ===
 mov al,50
@@ -14,3 +15,13 @@ myOtherVal db 60
 mov al,myVal
 add al,myOtherVal
 ===
+=======
+Dos
+Due
+Zwei
+Ni
+Du
+XA
+IS
+SE
+>>>>>>> 212d6bd1618312f9974ae686f45926c50b7b5a3d
