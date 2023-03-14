@@ -72,6 +72,13 @@ _start:
 	add rax,'0'
 	mov [numSuma],rax
 
+	mov rax,99
+	mov rbx,98
+	sub rax,rbx
+	add rax,'0'
+	mov [numSuma],rax
+
+
 	print msjSuma,longMsjSuma
 	print numSuma,longNumSuma
 	print newLine,longNewLine
