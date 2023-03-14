@@ -50,6 +50,8 @@ section .bss
 	numDif resb 4
 	longNumDif equ $-numDif
 	nuevaLinea resb 4
+	caracter resb 2
+	longCaracter equ $-caracter
 
 
 
@@ -73,19 +75,47 @@ _start:
 	mov [numSuma],rax
 
 	mov rax,99
-	mov rbx,98
+	mov rbx,4
 	sub rax,rbx
-	add rax,'0'
-	mov [numSuma],rax
+;	add rax,'0'
+;	mov [numSuma],rax
 
+;    mov rax, 123         ; integer to convert
+    mov rbx, 10          ; base 10
+    mov rcx, numSuma         ; pointer to the output string
+    jmp _itoaLoop
+_itoaLoop:
+    xor rdx, rdx         ; clear edx to use as quotient
+    div rbx            ; divide by 10
+    add rdx, '0'         ; convert remainder to ASCII digit
+    mov [rcx], dl        ; store digit in output string
+    inc rcx              ; move to next character in string
+    cmp rax, 0           ; check if quotient is zero
+    jne _itoaLoop      ; if not, continue loop
+
+;	mov [numSuma],rax
 
 	print msjSuma,longMsjSuma
+	mov rsi,numSuma
+	add rsi,longNumSuma
+	;mov rdx,longNumSuma
+	jmp _contarReves
 	print numSuma,longNumSuma
 	print newLine,longNewLine
 
 	jmp _exit
 
+_contarReves:
+	cmp rsi,numSuma
+	je _exit
+	dec rsi
+	mov al,[rsi]
+	mov [caracter],al
+	print caracter,longCaracter
+	jmp _contarReves
+
 _exit:;Se finaliza el programa
+	print newLine,longNewLine
 	;Llamada de salida
 	mov rbx,0 			;RBX=codigo de salido al 80 
 	mov rax,1			;RAX=funcion sys_exit() del kernel llama al sistema 
