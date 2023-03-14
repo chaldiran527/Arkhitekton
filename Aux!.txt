@@ -138,3 +138,84 @@ _start:
     xor ebx, ebx         ; exit with return code 0
     int 0x80             ; call kernel to exit program
 
+=====''''
+section .bss
+    str resb 4   ; reserve 4 bytes of space for the string
+
+section .text
+    global _start
+_start:
+    mov eax, 123         ; integer to convert
+    mov ebx, 10          ; base 10
+    mov ecx, str         ; pointer to the output string
+    xor edx, edx         ; clear edx to use as quotient
+.while_loop:
+    div ebx              ; divide by 10
+    add edx, '0'         ; convert remainder to ASCII digit
+    mov [ecx], dl        ; store digit in output string
+    inc ecx              ; move to next character in string
+    cmp eax, 0           ; check if quotient is zero
+    jne .while_loop      ; if not, continue loop
+    mov eax, 4           ; system call to print string to stdout
+    mov ebx, 1           ; file descriptor for stdout
+    mov ecx, str         ; pointer to string to print
+    mov edx, 3           ; number of bytes to print
+    int 0x80             ; call kernel to print string
+    mov eax, 1           ; system call to exit program
+    xor ebx, ebx         ; exit with return code 0
+    int 0x80             ; call kernel to exit program
+
+====;;;
+section .data
+    ; define the number string to convert
+    number_str db "1234", 0
+
+section .text
+    global _start
+
+    ; atoi procedure
+    atoi:
+        ; initialize variables
+        xor rax, rax        ; clear rax to hold the result
+        mov rbx, 10         ; base 10
+        mov rdi, rsi        ; set rdi to the number string address
+
+    .loop:
+        ; check for end of string
+        mov al, [rdi]
+        cmp al, 0
+        je .done
+
+        ; convert character to integer
+        sub al, '0'
+
+        ; multiply result by base
+        mul rbx
+
+        ; add current digit to result
+        add rax, rdi
+
+        ; increment string pointer
+        inc rdi
+
+        jmp .loop
+
+    .done:
+        ret
+
+    ; main program
+    _start:
+        ; call atoi procedure
+        mov rsi, number_str
+        call atoi
+
+        ; print result
+        mov rax, 1          ; write syscall
+        mov rdi, 1          ; stdout
+        mov rdx, 16         ; message length
+        syscall
+
+        ; exit program
+        mov rax, 60         ; exit syscall
+        xor rdi, rdi        ; return code 0
+        syscall
