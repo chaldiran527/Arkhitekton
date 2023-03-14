@@ -45,3 +45,69 @@ sub 1,'0'
 230+1=231
 
 
+====
+section .data
+    number db 2       ; define a variable called "number" with the value 2
+    exponent db 4     ; define a variable called "exponent" with the value 4
+
+section .text
+    global _start
+
+power:
+    push rbp
+    mov rbp, rsp      ; set up the stack frame
+    mov al, [rbp+16]  ; move the base number into AL
+    mov bl, [rbp+24]  ; move the exponent into BL
+    cmp bl, 0         ; compare exponent with 0
+    je .done          ; if exponent is 0, return 1
+
+    mov cl, al        ; store base number in CL
+    dec bl            ; decrement exponent
+
+.loop:
+    imul al, cl       ; multiply base number by CL and store result in AL
+    dec bl            ; decrement exponent
+    jnz .loop         ; jump to .loop if exponent is not zero
+
+.done:
+    mov rsp, rbp      ; restore the stack pointer
+    pop rbp
+    ret               ; return from the procedure
+
+
+section .data
+    num db 0      ; the input number to convert
+    str db 10, 0  ; the output string buffer
+                  ; reserve 10 bytes for the string and add a null terminator
+
+section .text
+    global _start   ; entry point for the program
+
+_start:
+    mov eax, 231    ; load the input number into EAX
+    mov byte [num], al  ; store the least significant byte of EAX in num
+
+    mov ebx, str    ; set EBX to point to the beginning of the output string
+    add ebx, 9      ; move EBX to the end of the buffer (reserve 10 bytes)
+
+itoa_loop:
+    xor edx, edx    ; clear EDX to prepare for division
+    div byte [num]  ; divide EAX by the number in num
+    add dl, '0'     ; convert the remainder to an ASCII digit
+    mov [ebx], dl   ; store the digit in the string buffer
+    dec ebx         ; move the buffer pointer back one byte
+
+    cmp eax, 0      ; check if the quotient is zero
+    jne itoa_loop   ; if not, repeat the loop
+
+    mov eax, 4      ; write system call
+    mov ebx, 1      ; file descriptor for stdout
+    mov ecx, str    ; output string
+    sub ecx, ebx    ; adjust pointer to the beginning of the string
+    mov edx, 10     ; string length
+    int 0x80        ; call kernel
+
+    mov eax, 1      ; exit system call
+    xor ebx, ebx    ; return 0 status
+    int 0x80        ; call kernel
+
