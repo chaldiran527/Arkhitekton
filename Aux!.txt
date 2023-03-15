@@ -219,3 +219,104 @@ section .text
         mov rax, 60         ; exit syscall
         xor rdi, rdi        ; return code 0
         syscall
+====;;;
+=====
+=====
+=====
+====;;;
+	.macro print string,len
+		mov $4, %eax
+		mov $1, %ebx
+		mov \string, %ecx
+		mov \len, %edx
+		int $0x80
+	.endm
+
+	.macro input buffer,len
+		mov \len, %edx
+		mov \buffer, %ecx
+		mov $0, %ebx
+		mov $3, %eax
+		int $0x80
+	.endm
+
+	.data
+	msj1: db 'Ingrese el primer numero: '
+	longMsj1 =.-msj1
+	msj2: db 0xA,'Ingrese el segundo numero: '
+	longMsj2 =.-msj2
+	msjSuma: db 0xA,'Suma de ambos numeros es: '
+	longMsjSuma =.-msjSuma
+	msjDif: db 0xA,'Diferencia de ambos numeros es: '
+	longMsjDif =.-msjDif
+	msjError: db 0xA,'ERROR: Usted acaba de ingresar un numero invalido!',0xA
+	longMsjError =.-msjError
+	val1: db 50
+	val2: db 60
+	newLine: db 0xA
+	longNewLine =.-newLine
+	numstr: db '1334',0
+	longNumStr =.-numstr
+
+	.bss
+	num1: resb 4
+	longNum1 =.-num1
+	num2: resb 4
+	longNum2 =.-num2
+	numSuma: resb 4
+	longNumSuma =.-numSuma
+	numDif: resb 4
+	longNumDif =.-numDif
+	nuevaLinea: resb 4
+	caracter: resb 2
+	longCaracter =.-caracter
+	numInt1: resb 4
+	longNumInt1 =.-numInt1
+	numInt2: resb 4
+	longNumInt2 =.-numInt2
+
+	.text
+	.globl _start
+
+	_start:
+		;Se pide y se recibe el input de los dos numeros a operar
+		print msj1, %longMsj1
+		input num1, %longNum1
+
+		;Se alistan los registros a ser usados para la conversion de Ascii a entero
+		xor %rbx,%rbx
+		xor %rcx,%rcx
+		mov num1, %rsi
+
+	cicloAtoi1:
+		cmpb $10, (%rsi)
+		je atoi1End
+
+		cmpb $48, (%rsi)
+		jb _error
+
+		cmpb $57, (%rsi)
+		ja _error
+
+		movzxb (%rsi), %rax
+		sub $'0', %rax
+		imul %rbx, %rax
+		add %rax, %rbx
+		inc %rsi
+		jmp cicloAtoi1
+
+	atoi1End:
+		mov %rbx, %rax
+		mov %rax, numInt1
+
+		print msj2, %longMsj2
+		input num2, %longNum2
+
+	;nuevo atoi para el segundo numero...
+		xor %rbx, %rbx
+		xor %rcx, %rcx
+		mov num2, %rsi
+
+	cicloAtoi2:
+
+		cmpb $10, (%rsi)
