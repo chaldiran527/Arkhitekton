@@ -1,18 +1,21 @@
 #*************************************************
-# Executable name : hola
+# Executable name : hexDump_x64
 # Version : 2.0
-# Created date : February 12, 2019
+# Created date : February 4, 2015
+# Last update : April 22, 2017
 # Authors : 
+#	Erick Hernandez
 #	Eduardo A. Canessa M
-# Description : simple makefile for GAS
-# Important Notice: To be used for GAS only
+# Description : simple makefile
+# Important Notice: You should install NASM and/or
+# YASM firs to run this makefile withot problems.
 #*************************************************
 #change the name "ejemplo" for the name of your source file
-name=tarea
+name=test
 #program to use as the assembler (you could use NASM or YASM for this makefile)
-ASM=as
+ASM=nasm
 #flags for the assember
-#ASM_F= #*** place here flags if needed ***
+ASM_F=-f elf64  #for x86-64 architecture use ASM_F=-f elf64 besides ASM_F=-f elf
 
 #program to use as linker
 LINKER=ld
@@ -22,6 +25,6 @@ $(name): $(name).o
 	$(LINKER) -o $(name) $(name).o
 
 #assemble source code
-$(name).o: $(name).s
-	$(ASM) $(ASM_F) -o $(name).o $(name).s
+$(name).o: $(name).asm
+	$(ASM) $(ASM_F) -o $(name).o $(name).asm
 
