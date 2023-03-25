@@ -43,24 +43,24 @@ section .data
 section .bss
 ;Variables sin inicializar a usar en el programa
 ;num1 y num2 almacenan los inputs del usuario
-	num1 resb 4
+	num1 resb 100
 	longNum1 equ $-num1
-	num2 resb 4
+	num2 resb 100
 	longNum2 equ $-num2
 ;numSuma almacena la suma de los dos numeros ingresados
-	numSuma resb 4
+	numSuma resb 100
 	longNumSuma equ $-numSuma
 ;numDif almacena la diferencia de los dos numeros ingresados 
-	numDif resb 4
+	numDif resb 100
 	longNumDif equ $-numDif
 	nuevaLinea resb 4
 	caracter resb 2
 	longCaracter equ $-caracter
 ;numInt1 almacena el primer numero entero convertido del string ingresado por el usuario
-	numInt1 resb 4
+	numInt1 resb 100
 	longNumInt1 equ $-numInt1
 ;numInt2 almacena el segundo numero entero convertido del string ingresado por el usuario
-	numInt2 resb 4
+	numInt2 resb 100
 	longNumInt2 equ $-numInt2
 
 
