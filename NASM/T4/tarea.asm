@@ -180,7 +180,8 @@ _itoa2:
 	cmp al,bl
 	jb _itoa2Num1Menor;Si al es menor se salta a itoa2Num1Menor para hacer la resta con los operandos al reves
 	sub al,bl;Sino se resta al con bl
-	movzx rax,al;Se mueve a rax con cero 
+	movzx rax,al;Se mueve a rax con cero
+	;Hasta aqui llegaria el proc  calc DIFF rax result
 	mov [numDif],rax;Se mueve al numDif el contenido de rax
 	mov rbx, 10;Se mueve un 10 directamente a rbx, pues estamos en base decimal 
 	mov rcx,numDif;Se mueve numDif a rcx

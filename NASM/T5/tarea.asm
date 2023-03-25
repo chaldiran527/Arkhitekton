@@ -88,14 +88,15 @@
 
 ;Procedure para imprimir una hilera al reves
 	printReves:
+
 		jmp .cicloPrintReves
 	.cicloPrintReves:
-		cmp rdi,rsp;Se verifica si rsi apunta a la posicion de numSUma
+		cmp rdi,rbp;Se verifica si rsi apunta a la posicion de numSUma
 		je  .finPrintReves;Si es igual rsi a numSuma se salta a _itoa2 
 		dec rdi;Se decrementa la posicion de rsi
 		mov al,[rdi];Se mueve a al el contenido de rsi
 		mov [caracter],al;Se mueve al a carcater
-		print caracter,longCaracter;Se imprime el caracter
+		print caracter,1;Se imprime el caracter
 		jmp .cicloPrintReves
 
 	.finPrintReves:
@@ -145,7 +146,8 @@ section .bss
 ;lenNumero2 almacena la cantidad de digitos del numero2
 	lenNumero2 resb 4;
 	longLenNumero2 equ $-lenNumero2
-
+	posInicial resb 100
+	longPosInicial equ $-posInicial
 
 section .text
 	global _start
@@ -187,7 +189,12 @@ _start:
 	mov rcx, numInt2
 	call Itoa; 
 
-	mov rsp,numInt2
+	;mov rsp,numInt2
+	;mov [posInicial],rsp
+
+	;mov rsp,[posInicial]
+
+	mov rbp,numInt2
 	mov rdi,numInt2
 	add rdi,longNumInt2
 	call printReves
