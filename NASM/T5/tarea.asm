@@ -51,6 +51,9 @@
 		cmp byte[rsi],10;Se compara si el caracter actual es el newline 10 en ascii
 		je .finAtoi;Si es igual a 10 se salta a atoi1End terminando este ciclo
 
+		cmp byte[rsi],0
+		je .finAtoi
+
 		cmp byte[rsi],48;Se compara si el caracter actual es menor que 48(cero en ascii)
 		jb _error;Si es menor el string no es numerico y se indica el error al usuario
 
@@ -227,15 +230,9 @@ _start:
 	call calcSuma
 	mov [numSuma],rax
 
-
 	;===Ahora hacer el proc de itoa probando con numSuma
 	mov rcx, numSuma
 	call Itoa; 
-
-
-
-
-
 	;===Ahora hacer el proc de printReves para suma
 	mov rbp,numSuma
 	mov rdi,numSuma
@@ -249,9 +246,22 @@ _start:
 	mov rdi,numDif
 	add rdi,longNumDif
 	call printReves
+;REPETIOS EL CICLO 
+	mov rcx,numInt1
+	call Itoa; 
 
+	mov rsi,numInt1;Se mueve a rsi el string numerico ingresado por el input param proc
+	call Atoi
+	mov [numInt1], rax
 
+	mov rcx,numInt1
+	call Itoa; 
 
+	print newLine,longNewLine;
+	mov rbp,num1
+	mov rdi,num1
+	add rdi,longNum1
+	call printReves
 
 	jmp _exit
 
