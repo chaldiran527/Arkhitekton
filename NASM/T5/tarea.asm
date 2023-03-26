@@ -70,6 +70,7 @@
 
 ;Procedure para convertir un numero en decimal a ascii pasado por parametro en un registro 	
 	Itoa:
+
 		mov rbx,10
 		jmp .cicloItoa
 
@@ -102,6 +103,31 @@
 	.finPrintReves:
 		ret
 
+;Procedure para calcular la suma de dos numeros enteros
+
+	calcSuma:
+		add rax,rbx;rax numInt1 y rbx numInt2
+		jmp .finCalcSuma
+
+	.finCalcSuma:
+		ret
+
+;Procedure para calcular al diferencia de dos numeros enteros 
+	calcDif:
+	;al primer numero a restar y bl es el segundo 
+		cmp al,bl           ; Verificar si al es menor que bl 
+		jb .num1Menor
+		sub al,bl			; Sino se resta al con bl
+		movzx rax,al 		; Se mueve a rax con cero
+		jmp .finCalcDif
+	
+	.num1Menor:
+		sub bl,al ;Se resta bl con al 
+		movzx rax,bl;Se mueve a rax con cero
+		jmp .finCalcDif
+
+	.finCalcDif:
+		ret
 
 section .data
 ;Hileras de los mensajes a mostrar en la consola al uduario
@@ -149,6 +175,7 @@ section .bss
 	posInicial resb 100
 	longPosInicial equ $-posInicial
 
+
 section .text
 	global _start
 
@@ -185,21 +212,47 @@ _start:
 	mov [numInt2], rax
 
 
-	;===Ahora hacer el proc de itoa probando con numInt2 
-	mov rcx, numInt2
+	;===Ahora hacer el proc de sum de dos numeros enteros
+	mov rax,[numInt1]
+	mov rbx,[numInt2]
+	call calcDif		;rax tiene resultado
+	mov [numDif],rax
+
+	;Probando con numDif
+	mov rcx, numDif
+	call Itoa
+
+	mov rax,[numInt1]
+	mov rbx,[numInt2]
+	call calcSuma
+	mov [numSuma],rax
+
+
+	;===Ahora hacer el proc de itoa probando con numSuma
+	mov rcx, numSuma
 	call Itoa; 
 
-	;mov rsp,numInt2
-	;mov [posInicial],rsp
 
-	;mov rsp,[posInicial]
 
-	mov rbp,numInt2
-	mov rdi,numInt2
-	add rdi,longNumInt2
+
+
+	;===Ahora hacer el proc de printReves para suma
+	mov rbp,numSuma
+	mov rdi,numSuma
+	add rdi,longNumSuma
 	call printReves
 
-	;===Ahora hacer el proc de printReves
+	print newLine,longNewLine;
+
+	;Para diferencia
+	mov rbp,numDif
+	mov rdi,numDif
+	add rdi,longNumDif
+	call printReves
+
+
+
+
 	jmp _exit
 
 
