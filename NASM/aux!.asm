@@ -114,11 +114,9 @@
 	    jmp .finCicloItoa
 	    
 	.finCicloItoa:
-
 	    mov rsi,rcx
 	    mov rcx,rsi
 	    shr rsi,1
-
 	    jz .finItoa
 	    jmp .invertirNumero
 
@@ -282,39 +280,40 @@ _start:
 
 	revertirNumStr numSuma
 	print numSuma,longNumSuma
-
+	
+	jmp _exit
+	mov rbp,numSuma
+	mov rdi,numSuma
+	add rdi,longNumSuma
+	call printReves
 
 	print newLine,longNewLine;
 
 	;Para diferencia
-	revertirNumStr numDif
-	print numDif,longNumDif
-
-	jmp _exit
-
 	mov rbp,numDif
 	mov rdi,numDif
 	add rdi,longNumDif
+	call printReves
+
+
+	;jmp _exit
+;REPETIOS EL CICLO 
+	mov rsi,num2;Se mueve a rsi el string numerico ingresado por el input param proc
+	call Atoi
+	mov [numInt2], rax
+
+	mov rcx,numInt2
+	call Itoa; 
+
+	mov rbp,numInt2
+	mov rdi,numInt2
+	add rdi,longNumInt2
 	print newLine,longNewLine; 
 	call printReves
 
-	jmp _exit
-	mov rsi,num1;Se mueve a rsi el string numerico ingresado por el input param proc
-	call Atoi
-	mov [numInt1], rax
-
-	mov rcx,numInt1
-	call Itoa
-	print newLine,longNewLine
-	revertirNumStr numInt1;Post this se puede hacer Atoi y tener el valor original en integer
-	print numInt1,longNumInt1
-
+;Finalizado el print
 	jmp _exit
 
-;===Loop y luego proc para hacer la conversion de base 10 a base n. n veces(16)
-;=El loop repite los llamados, la preparacion de numInt1,numInt2,numSuma,numDif
-;y su print en la pantalla respectivo para luego ejecutar nuevamente el loop
-;=El procedure hace la conversion de cada uno de los cuatro o de uno de los numeros decimales
 
 
 ;Se salta aqui en caso de detectar que se ingreso un caracter no numerico 
