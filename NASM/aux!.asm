@@ -296,7 +296,7 @@ _start:
 	call printReves
 
 
-	jmp _exit
+	;jmp _exit
 ;REPETIOS EL CICLO 
 	mov rsi,num2;Se mueve a rsi el string numerico ingresado por el input param proc
 	call Atoi

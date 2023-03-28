@@ -114,9 +114,11 @@
 	    jmp .finCicloItoa
 	    
 	.finCicloItoa:
+
 	    mov rsi,rcx
 	    mov rcx,rsi
 	    shr rsi,1
+
 	    jz .finItoa
 	    jmp .invertirNumero
 
@@ -288,7 +290,15 @@ _start:
 	revertirNumStr numDif
 	print numDif,longNumDif
 
+	jmp _exit
 
+	mov rbp,numDif
+	mov rdi,numDif
+	add rdi,longNumDif
+	print newLine,longNewLine; 
+	call printReves
+
+	jmp _exit
 	mov rsi,num1;Se mueve a rsi el string numerico ingresado por el input param proc
 	call Atoi
 	mov [numInt1], rax
