@@ -115,17 +115,20 @@
 	    
 	.finCicloItoa:
 
-	    mov rsi,rcx
+	   ; mov rsi,rcx
 	    mov rcx,rsi
-	    shr rsi,1
-
-	    jz .finItoa
+	    ;cambios
+	    dec rsi
+	    shr rcx,1
+	 	jz .finItoa
 	    jmp .invertirNumero
 
 	.invertirNumero:
-		mov al,[rdi + rcx - 1]
-		xchg al, [rdi + rsi]
-		mov [rdi + rcx - 1], al
+		mov al,[rdi + rsi]
+		mov ah,[rdi + rcx]
+		;xchg al, [rdi + rcx]
+		mov [rdi + rsi], al
+		mov [rdi + rsi], ah
 		dec rcx
 		inc rsi
 		cmp rsi,rcx
@@ -178,6 +181,38 @@
 	.finCalcDif:
 		ret
 
+	hileraInvertida:
+		mov rcx,0
+		mov r9,rsi
+		jmp .cicloA
+
+	.cicloA:
+		cmp byte[rsi],0
+		je .revertir
+		inc rcx
+		inc rsi
+		jmp .cicloA
+
+	.revertir:
+		mov rdi, r9
+		mov rsi, r9
+		add rsi, rcx
+		dec rsi
+		jmp .cicloB
+
+	.cicloB:
+		cmp rdi, rsi
+		jge .finHileraInvertida
+		mov al,[rdi]
+		xchg al,[rsi]
+		mov [rdi],al
+		inc rdi
+		dec rsi
+		jmp .cicloB
+
+	.finHileraInvertida:
+		ret
+
 section .data
 ;Hileras de los mensajes a mostrar en la consola al uduario
 	msj1 db 'Ingrese el primer numero: '
@@ -223,6 +258,10 @@ section .bss
 	longLenNumero2 equ $-lenNumero2
 	posInicial resb 100
 	longPosInicial equ $-posInicial
+	numSumaInt resb 100
+	longNumSumaInt equ $-numSumaInt
+	numDifInt  resb 100
+	longNumDifInt equ $-numDifInt
 
 
 section .text
@@ -274,11 +313,58 @@ _start:
 	mov rax,[numInt1]
 	mov rbx,[numInt2]
 	call calcSuma
+	mov rbx,rax
 	mov [numSuma],rax
 
+
+	mov rcx, numSuma
+	call Itoa
+	;reverir string resultante del itoa 
+	mov rsi, numSuma
+	call hileraInvertida
+	print numSuma,longNumSuma
+	print newLine,longNewLine
+
+	mov rsi, numDif
+	call hileraInvertida
+	print numDif,longNumDif
+	print newLine,longNewLine
+
+	mov rsi,numDif;Se mueve a rsi el string numerico ingresado por el input param proc
+	call Atoi
+	mov [numDif], rax
+
+	mov rcx, numDif
+	call Itoa
+
+	mov rsi,numDif
+	call hileraInvertida
+	print numDif,longNumDif
+
+	jmp _exit
+
+
+	mov rcx, numSuma
+	call Itoa 
+	mov rbp,numSuma
+	mov rdi,numSuma
+	add rdi,longNumSuma
+	call printReves
+	print newLine,longNewLine
+
+	mov rcx, numSumaInt
+	call Itoa 
+	mov rbp,numSumaInt
+	mov rdi,numSumaInt
+	add rdi,longNumSumaInt
+	call printReves
+
+	jmp _exit
 	;===Ahora hacer el proc de itoa probando con numSuma
 	mov rcx, numSuma
 	call Itoa; 
+
+
 
 	revertirNumStr numSuma
 	print numSuma,longNumSuma
