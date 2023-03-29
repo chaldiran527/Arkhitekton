@@ -242,3 +242,53 @@ section .text
     mov rdi,numInt2
     add rdi,longNumInt2
     call printReves
+
+;========================================
+section .data
+    num dq 1234567890123456789 ; the number to be converted
+    result db 20 dup(0)        ; buffer to hold the converted number
+
+section .text
+global convert_to_octal
+
+convert_to_octal:
+    push rbp
+    mov rbp, rsp
+    
+    ; initialize registers
+    mov rax, [num]
+    mov rcx, result       ; set destination pointer
+
+loop:
+    ; divide the number by 8
+    xor rdx, rdx
+    div qword 8
+
+    ; save the remainder in the buffer
+    add dl, '0'
+    mov [rcx], dl
+    inc rcx
+
+    ; continue loop if quotient is not zero
+    cmp rax, 0
+    jne loop
+
+    ; add terminating null character to buffer
+    mov byte [rcx], 0
+
+    ; reverse the result string
+    mov rsi, result
+    mov rdi, result
+    mov rcx, rcx
+    shr rcx, 1
+reverse_loop:
+    mov al, [rsi]
+    mov dl, [rdi+rcx-1]
+    mov [rsi], dl
+    mov [rdi+rcx-1], al
+    inc rsi
+    dec rcx
+    jnz reverse_loop
+
+    pop rbp
+    ret
