@@ -227,6 +227,10 @@ section .data
 	longMsjError equ $ - msjError
 	newLine db 0xA;Nuevalinea para separar las hileras a mostrar en la consola
 	longNewLine equ $ - newLine
+	strPrueba db 'adam',0
+	longStrPrueba equ $-strPrueba
+	numPrueba dw '123';
+	longNumPrueba equ $-numPrueba
 
 section .bss
 ;Variables sin inicializar a usar en el programa
@@ -262,13 +266,18 @@ section .bss
 	longNumSumaInt equ $-numSumaInt
 	numDifInt  resb 100
 	longNumDifInt equ $-numDifInt
-
+	numInput resb 100
+	longNumInput equ $-numInput
+	numDifStr resb 100
+	longNumDifStr equ $-numDifStr
+	numSumaStr resb 100
+	longNumSumaStr equ $-numSumaStr
 
 section .text
 	global _start
 
 _start:
-	;Se pide y se recibe el input de los dos numeros a operar
+	
 	print msj1, longMsj1
 	input num1, longNum1
 
@@ -324,12 +333,38 @@ _start:
 	call hileraInvertida
 	print numSuma,longNumSuma
 	print newLine,longNewLine
+	
+	mov r12, numSuma
+	mov [numSumaStr],r12
+
 
 	mov rsi, numDif
 	call hileraInvertida
 	print numDif,longNumDif
 	print newLine,longNewLine
 
+	mov r11,[numDif]
+	mov [numDifStr],r11
+
+	jmp _inicioPrueba
+
+
+	_inicioPrueba:
+		jmp_exit
+
+	jmp _exit
+
+	mov rsi,numDifStr;
+	call Atoi
+	mov [numDif], rax
+
+	mov rcx,numDif
+	call Itoa
+	mov rsi,numDif
+	call hileraInvertida
+	print numDif,longNumDif
+
+	jmp _exit
 	mov rsi,numDif;Se mueve a rsi el string numerico ingresado por el input param proc
 	call Atoi
 	mov [numDif], rax
@@ -339,9 +374,19 @@ _start:
 
 	mov rsi,numDif
 	call hileraInvertida
-	print numDif,longNumDif
+	print numDif,longNumDif;
 
 	jmp _exit
+;=================================================
+;=================================================
+;=================================================
+;=================================================
+;=================================================
+;=================================================
+;=================================================
+;=================================================
+;=================================================
+
 
 
 	mov rcx, numSuma

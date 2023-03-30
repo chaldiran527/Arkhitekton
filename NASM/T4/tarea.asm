@@ -183,6 +183,7 @@ _itoa2:
 	movzx rax,al;Se mueve a rax con cero
 	;Hasta aqui llegaria el proc  calc DIFF rax result
 	mov [numDif],rax;Se mueve al numDif el contenido de rax
+	;=====FINE
 	mov rbx, 10;Se mueve un 10 directamente a rbx, pues estamos en base decimal 
 	mov rcx,numDif;Se mueve numDif a rcx
 

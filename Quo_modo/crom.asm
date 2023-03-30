@@ -1,140 +1,78 @@
+%include "tarea.asm"
 
 section .data
-
-
-
-Bienvenida db "Bienvenido a la tutoria de ensamblador ", 0XA
-lenbienvenida equ $-Bienvenida
-
-
-pregunta db "Por favor Ingrese su numero: ", 0XA
-lenpregunta equ $-pregunta
-
-error db "error",0xA
-lenerror equ $-error
-
-digits db '0123456789', 0xA
-
-
-
-
+    output: db "Number in base 4: ", 0
+    digits: db "0123"
+    input: dd 412
+    newLine db 0xA,'',0xA,0xA
+    longNewLine equ $-newLine
 
 section .bss
-
-
-input resb 20
-resultado resb 20
-
-
+    result resb 20
+    lenResult equ $-result
+    
 section .text
+    global _start
+    
+_start:
+    mov eax, [input]
+    mov ebx, 2
+    mov ecx, result
+    
+    mov edx, 0
+    divide_loop:
+        xor edx, edx
+        div ebx
+        add edx, '0'
+        mov byte [ecx], dl
+        inc ecx
+        cmp eax, 0
+        jnz divide_loop
+    
+    mov byte [ecx], 0
+    
+    ; reverse the string in result
+    mov ecx, result
+    mov ebx, ecx
+    dec ebx
+    reverse_loop:
+        cmp ecx, ebx
+        jge done_reversing
+        mov al, [ecx]
+        mov ah, [ebx]
+        mov [ecx], ah
+        mov [ebx], al
+        inc ecx
+        dec ebx
+        jmp reverse_loop
+    done_reversing:
+    
+    ; print the output string
+    mov eax,4
+    mov ebx,1
+    mov ecx,result
+    mov edx,lenResult
+    int 0x80
+    
+    ; print the converted number string
+    mov ecx, result
+    mov edx, ecx
+    count_digits:
+        cmp byte [edx], 0
+        je done_counting
+        inc edx
+        jmp count_digits
+        
+    
+    done_counting:
+        sub edx, result
 
-global _start
-
-	_start:
-		call _imprimirbienvenida
-		call _imprimirpregunta
-		call _getinput
-		call _imprimirinput
-		call _atoi
-		call _salir
-
-
-
-
-	
-
-
-_imprimirbienvenida:
-	mov rax, 1
-	mov rdi, 1
-	mov rsi, Bienvenida
-	mov rdx, lenbienvenida
-	syscall
-	ret
-
-
-_imprimirpregunta:
-	mov rax, 1
-	mov rdi, 1
-	mov rsi, pregunta
-	mov rdx, lenpregunta
-	syscall
-	ret
-
-
-
-_getinput:
-    mov rax, 0
-    mov rdi, 0
-    mov rsi, input
-    mov rdx, 200
-    syscall
-    ret
-
-
-_atoi:     ;ascii to integer
-	xor r10, r10  ;para iterar por el input
-	xor rax, rax ; vamos a guardar el numero
-	xor r11, r11 ;aqui vamos a hacer operaciones
-	mov r10, input ;movimos el input a r10
-.next:
-	movzx r11, byte[r10]
-	cmp r11, 0xA ;para saber si ya terminamos
-	je _sumar
-
-	sub r11, '0' ;convirtiendolo a numero
-	imul rax, 10 
-	add rax, r11
-	inc r10
-	jmp .next
-
-
-_sumar:
-	imul rax, 15
-	jmp _itoa
-
-_itoa:   ;integer to ascii
-	xor rcx, rcx ;vamos a poner el divisor
-	xor rdx, rdx ;aqui vamos a guardar el residuo
-	xor r8, r8 ;movimientos
-	xor r9, r9 ;iterar por 2da variable
-	mov rcx, 10 ;nuestro divisor
-
-
-.next:
-
-	cmp rax, 0   ;si llegamos a 0, no hay nada mas que dividir
-	je _imprimirresultado
-
-	div rcx 	;rax/rcx
-	mov r8b, byte[digits+rdx]
-	mov byte[resultado+r9], r8b
-	inc r9
-	xor rdx, rdx
-	jmp .next
-	
-
-	
-
-_imprimirinput:
-	mov rax, 1
-	mov rdi, 1
-	mov rsi, input
-	mov rdx, 20
-	syscall
-	ret
-
-
-_imprimirresultado:
-	mov rax, 1
-	mov rdi, 1
-	mov rsi, resultado
-	mov rdx, 20
-	syscall
-
-
-_salir:
-	mov rax, 60
-	mov rdi, 0
-	syscall	
-
+    mov eax,4
+    mov ebx,1
+    mov ecx,output
+    mov ebx,19
+    int 0x80
+    
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
