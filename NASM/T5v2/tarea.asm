@@ -1,4 +1,3 @@
-;%include "tarea.asm"
 
 ;===========================================================
 ;Programa que calcula la suma y la diferencia de dos numeros ingresados y hace su conversion en bases 2 a 16 
@@ -288,8 +287,8 @@ _exit:;Se finaliza el programa
         inc rsi;Se incrementa rsi para avanzar en la hilera
         jmp .cicloAtoi;Se devuelve para repetir el cicloAtoi1
 
-    .finAtoi:
-        mov rax,rbx;
+    .finAtoi:;Se finaliza el procedimiento 
+        mov rax,rbx; Se mueve a rax el numero resultante post Atoi
         ret
 
 ;Procedure para convertir un numero en decimal a ascii pasado por parametro en un registro  
@@ -330,7 +329,7 @@ _exit:;Se finaliza el programa
         jmp .finCicloItoa
         
     .finCicloItoa:
-;Intento de revertir la hilera al finalizar el cicloItoa pero no funciona :( (se invierte posterior al itoa con el procedimiento hileraInvertida!)
+;Intento de revertir la hilera al finalizar el cicloItoa pero no funciona :( (se invierte posterior al itoa llamando al procedimiento hileraInvertida!)
        ; mov rsi,rcx
         mov rcx,rsi
         ;cambios
@@ -382,7 +381,7 @@ _exit:;Se finaliza el programa
 ;Procedure para calcular al diferencia de dos numeros enteros 
     calcDif:
     ;rax primer numero a restar y rbx es el segundo 
-        cmp rax,rbx           ; Verificar si al es menor que bl 
+        cmp rax,rbx           ; Verificar si rax es menor que rbx 
         jb .num1Menor
         sub rax,rbx         ; Sino se resta al con rnx
         jmp .finCalcDif

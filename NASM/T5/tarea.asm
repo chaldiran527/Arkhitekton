@@ -170,7 +170,6 @@
 		cmp rax,rbx           ; Verificar si al es menor que bl 
 		jb .num1Menor
 		sub rax,rbx			; Sino se resta al con bl
-		div 0
 		;movzx rax,al 	
 		jmp .finCalcDif
 	
@@ -264,6 +263,7 @@ section .data
 	longStrPrueba equ $-strPrueba
 	espacio db '             '
 	longEspacio equ $-espacio
+	baseN dd 1
 
 section .bss
 ;Variables sin inicializar a usar en el programa
@@ -310,7 +310,16 @@ section .text
 	global _start
 
 _start:
-	
+	mov r11,9
+	mov rax,r11
+	mov [numSuma],rax
+	mov rcx, numSuma
+	call Itoa
+	;reverir string resultante del itoa 
+	mov rsi, numSuma
+	call hileraInvertida
+	print numSuma,longNumSuma
+	jmp _exit
 	print msj1, longMsj1
 	input num1, longNum1
 

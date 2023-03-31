@@ -128,9 +128,3 @@ _incrementarContador:;Se incrementa el contador 'cl'
 	mov rsi,hilera
 	print hileraConvertida,longHileraConvertida
 	jmp _loop
-
-_exit:;Se finaliza el programa
-	;Llamada de salida
-	mov rbx,0 			;RBX=codigo de salido al 80 
-	mov rax,1			;RAX=funcion sys_exit() del kernel llama al sistema 
-	int 0x80 			;Llamada al sistema para acabar la ejecucion del programa

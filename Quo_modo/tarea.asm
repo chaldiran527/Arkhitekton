@@ -8,6 +8,7 @@
 ;Macros a ser usados en este programa 
 
 
+
 ;Macro para imprimir mensaje con 2 parametros(%1 de hilera,%2 de longitud de la hilera)
 	%macro print 2
 		mov rax, 4
