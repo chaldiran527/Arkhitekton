@@ -153,15 +153,16 @@
 ;Procedure para calcular al diferencia de dos numeros enteros 
 	calcDif:
 	;al primer numero a restar y bl es el segundo 
-		cmp al,bl           ; Verificar si al es menor que bl 
+		cmp rax,rbx           ; Verificar si al es menor que bl
 		jb .num1Menor
-		sub al,bl			; Sino se resta al con bl
-		movzx rax,al 		; Se mueve a rax con cero
+		sub rax,rbx			; Sino se resta al con bl
+		;movzx rax,al 		; Se mueve a rax con cero
 		jmp .finCalcDif
 	
 	.num1Menor:
-		sub bl,al ;Se resta bl con al 
-		movzx rax,bl;Se mueve a rax con cero
+		sub rbx,rax ;Se resta bl con al 
+		mov rax,rbx
+		;movzx rax,bl;Se mueve a rax con cero
 		jmp .finCalcDif
 
 	.finCalcDif:

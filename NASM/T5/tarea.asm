@@ -167,15 +167,16 @@
 ;Procedure para calcular al diferencia de dos numeros enteros 
 	calcDif:
 	;al primer numero a restar y bl es el segundo 
-		cmp al,bl           ; Verificar si al es menor que bl 
+		cmp rax,rbx           ; Verificar si al es menor que bl 
 		jb .num1Menor
-		sub al,bl			; Sino se resta al con bl
-		movzx rax,al 		; Se mueve a rax con cero
+		sub rax,rbx			; Sino se resta al con bl
+		div 0
+		;movzx rax,al 	
 		jmp .finCalcDif
 	
 	.num1Menor:
-		sub bl,al ;Se resta bl con al 
-		movzx rax,bl;Se mueve a rax con cero
+		sub rbx,rax ;Se resta bl con al 
+		;movzx rax,bl;Se mueve a rax con cero
 		jmp .finCalcDif
 
 	.finCalcDif:
@@ -213,24 +214,56 @@
 	.finHileraInvertida:
 		ret
 
+	baseConversion:
+        ;xor ecx,ecx
+        jmp .divCiclo
+
+    .divCiclo:
+        xor edx, edx
+        div ebx
+        cmp edx, 10
+        jl .conversionDigito
+        add edx, 'A' - 10
+        jmp .almacenarDigito
+
+
+    .conversionDigito:
+    	add edx,'0'
+    	jmp .almacenarDigito
+
+    .almacenarDigito:
+    	mov byte[ecx],dl
+    	inc ecx 
+    	cmp eax, 0
+    	jnz .divCiclo
+    	jmp .finConversion
+
+    .finConversion:
+    	mov byte[ecx],0
+    	ret 
+
 section .data
 ;Hileras de los mensajes a mostrar en la consola al uduario
 	msj1 db 'Ingrese el primer numero: '
 	longMsj1 equ $ - msj1
 	msj2 db 0xA,'Ingrese el segundo numero: '
 	longMsj2 equ $ - msj2
-	msjSuma db 0xA,'Suma de ambos numeros es: '
-	longMsjSuma equ $ - msjSuma
-	msjDif db 0xA,'Diferencia de ambos numeros es: '
-	longMsjDif equ $ - msjDif
 	msjError db 0xA,'ERROR: Usted acaba de ingresar un numero invalido!',0xA
 	longMsjError equ $ - msjError
 	newLine db 0xA;Nuevalinea para separar las hileras a mostrar en la consola
 	longNewLine equ $ - newLine
+	msjSuma db '   Suma: ',0
+	longMsjSuma equ $ - msjSuma
+	msjBase db 'Base ',0
+	longMsjBase equ $-msjBase
+	msjDif db '   Diferencia: ',0
+	longMsjDif equ $-msjDif
+	msjContinuacion db 'Presione enter para continuar ',0xA
+   ;msjgenera1 db 'Base 2___        ___          ___         ___          ___'
 	strPrueba db 'adam',0
 	longStrPrueba equ $-strPrueba
-	numPrueba dw '123';
-	longNumPrueba equ $-numPrueba
+	espacio db '             '
+	longEspacio equ $-espacio
 
 section .bss
 ;Variables sin inicializar a usar en el programa
@@ -246,7 +279,7 @@ section .bss
 	numDif resb 100
 	longNumDif equ $-numDif
 	nuevaLinea resb 4
-	caracter resb 2
+	caracter resb 10
 	longCaracter equ $-caracter
 ;numInt1 almacena el primer numero entero convertido del string ingresado por el usuario
 	numInt1 resb 100
@@ -318,6 +351,9 @@ _start:
 	;Probando con numDif
 	mov rcx, numDif
 	call Itoa
+	mov rsi, numDif
+	call hileraInvertida
+
 
 	mov rax,[numInt1]
 	mov rbx,[numInt2]
@@ -331,122 +367,124 @@ _start:
 	;reverir string resultante del itoa 
 	mov rsi, numSuma
 	call hileraInvertida
-	print numSuma,longNumSuma
+;	print numSuma,longNumSuma
 	print newLine,longNewLine
 	
-	mov r12, numSuma
-	mov [numSumaStr],r12
+	;mov r12, numSuma
+	;mov [numSumaStr],r12
 
 
-	mov rsi, numDif
-	call hileraInvertida
-	print numDif,longNumDif
-	print newLine,longNewLine
-
-	mov r11,[numDif]
-	mov [numDifStr],r11
-
-	jmp _inicioPrueba
+;	print numDif,longNumDif
 
 
-	_inicioPrueba:
-		jmp_exit
+;;;	
+	jmp _prueba
+	mov r13,16
+	_cicloPrograma:
+		push rsi
+		push rax
+		push rcx
+		print msjBase, longMsjBase
+		mov r14,r13
+		add r14,'0'
+		mov [caracter],r14
+		print caracter,longCaracter
+		print msjSuma,longMsjSuma
 
-	jmp _exit
+	    mov rsi,numSuma
+		call Atoi
+		mov [numSumaInt],rax
 
-	mov rsi,numDifStr;
-	call Atoi
-	mov [numDif], rax
+		mov eax, [numSumaInt];
+	    mov rbx, r13
+	    mov ecx, numSumaStr
+	    call baseConversion
 
-	mov rcx,numDif
-	call Itoa
-	mov rsi,numDif
-	call hileraInvertida
-	print numDif,longNumDif
+	    mov rsi, numSumaStr
+	    call hileraInvertida
+	    print numSumaStr,longNumSumaStr
 
-	jmp _exit
-	mov rsi,numDif;Se mueve a rsi el string numerico ingresado por el input param proc
-	call Atoi
-	mov [numDif], rax
+	    print msjDif,longMsjDif
 
-	mov rcx, numDif
-	call Itoa
+	    mov rsi,numDif
+		call Atoi
+		mov [numDifInt],rax
 
-	mov rsi,numDif
-	call hileraInvertida
-	print numDif,longNumDif;
+	    mov eax, [numDifInt];recibe input
+	    mov rbx, r13
+	    mov ecx, numDifStr
+	    call baseConversion
 
-	jmp _exit
-;=================================================
-;=================================================
-;=================================================
-;=================================================
-;=================================================
-;=================================================
-;=================================================
-;=================================================
-;=================================================
+	    mov rsi, numDifStr
+	    call hileraInvertida
+	    print numDifStr,longNumDifStr
+	    inc r13
+	    print newLine,longNewLine
+	    ;jmp _exit
+	    ;cmp r13,3
+	    ;je _prepararBase
+	    cmp r13,13
+	    je _prepararBase
+	    cmp r13, 16
+	    ja _exit
+	    pop rsi
+		pop rax
+		pop rcx
+	    jmp _cicloPrograma
 
+	 _prepararBase:
+	    	inc r13
+	    	jmp _cicloPrograma
 
+	    ;jmp _cicloPrograma
 
-	mov rcx, numSuma
-	call Itoa 
-	mov rbp,numSuma
-	mov rdi,numSuma
-	add rdi,longNumSuma
-	call printReves
-	print newLine,longNewLine
+    _prueba:
+    	mov r13,11
+;;;;;;;;;;;;;;;;;;;;
+;		mov rax, numSumaInt
+;		mov rcx,100
+;		xor rdx,rdx
+;		cld 
+;		rep stosb 
 
-	mov rcx, numSumaInt
-	call Itoa 
-	mov rbp,numSumaInt
-	mov rdi,numSumaInt
-	add rdi,longNumSumaInt
-	call printReves
+		mov rsi,numSuma
+		call Atoi
+		mov [numSumaInt],rax
 
-	jmp _exit
-	;===Ahora hacer el proc de itoa probando con numSuma
-	mov rcx, numSuma
-	call Itoa; 
+	    mov eax, [numSumaInt];recibe input
+	    mov rbx, 11
+	    xor ecx,ecx
+	    mov ecx, numSumaStr
+	    call baseConversion
 
+	    mov rsi, numSumaStr
+	    call hileraInvertida
+	    print numSumaStr,longNumSumaStr
 
+	    jmp _exit
 
-	revertirNumStr numSuma
-	print numSuma,longNumSuma
+	    print newLine,longNewLine
 
+	    print numDif,longNumDif
+	    print newLine,longNewLine
+	    
+	;;;;;;;;;;;;;;;;;;;
+		inc r13
+		mov rsi,numDif
+		call Atoi
+		mov [numDifInt],rax
 
-	print newLine,longNewLine;
+	 	mov eax, [numDifInt];
+	    mov rbx, r13
+	    xor ecx,ecx
+	    mov ecx, numDifStr
+	    call baseConversion
 
-	;Para diferencia
-	revertirNumStr numDif
-	print numDif,longNumDif
+	    mov rsi, numDifStr
+	    call hileraInvertida
+	    print numDifStr,longNumDifStr
 
-	jmp _exit
-
-	mov rbp,numDif
-	mov rdi,numDif
-	add rdi,longNumDif
-	print newLine,longNewLine; 
-	call printReves
-
-	jmp _exit
-	mov rsi,num1;Se mueve a rsi el string numerico ingresado por el input param proc
-	call Atoi
-	mov [numInt1], rax
-
-	mov rcx,numInt1
-	call Itoa
-	print newLine,longNewLine
-	revertirNumStr numInt1;Post this se puede hacer Atoi y tener el valor original en integer
-	print numInt1,longNumInt1
-
-	jmp _exit
-
-;===Loop y luego proc para hacer la conversion de base 10 a base n. n veces(16)
-;=El loop repite los llamados, la preparacion de numInt1,numInt2,numSuma,numDif
-;y su print en la pantalla respectivo para luego ejecutar nuevamente el loop
-;=El procedure hace la conversion de cada uno de los cuatro o de uno de los numeros decimales
-
+		jmp _exit
 
 ;Se salta aqui en caso de detectar que se ingreso un caracter no numerico 
 _error:
