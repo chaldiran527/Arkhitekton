@@ -183,6 +183,7 @@
 
     calcSuma:
         add rax,rbx;rax numInt1 y rbx numInt2
+        jo _errorOverflow
         jmp .finCalcSuma
 
     .finCalcSuma:

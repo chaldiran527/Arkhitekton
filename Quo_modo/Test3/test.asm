@@ -19,6 +19,8 @@ section .data
     longMsjResta equ $-msjResta
     msjError db 0xA,'ERROR: Usted acaba de ingresar un numero invalido!',0xA
     longMsjError equ $ - msjError
+    msjErrorOf db 'ERROR: Resultado de la suma supera los 64 bits, hay overflow!',0
+    longMsjErrorOf equ $-msjErrorOf
     teste db '1',0
     longTeste equ $-teste
     msjResultSuma db 'Resultado de la suma: ',0
@@ -141,8 +143,35 @@ _start:
 	jmp _start
 
 _suma:
+    ;===Se ejecuta el proc de suma y resta de los dos numeros enteros
+    mov rax,[numInt1]
+    mov rbx,[numInt2]
+    call calcSuma   
+    mov [numSuma],rax ;rax tiene resultado
+
+
+    ;Verificar si hubo overflow en numSuma
+
+    mov rax, [numSuma]  ;Se mueve a eax el numero a convertir de la suma
+    mov rbx, 10
+    xor rcx,rcx         ;Se mueve a eax el numero a convertir de la diferencia
+    mov rcx, resultSuma ;Se almacena el resultado de la conversion en resultSuma
+    call conversionBase    ;Se llama al procedure para convertir a la base actual en r13
+
+    mov rsi, resultSuma ;rsi va como parametro 
+    call hileraInvertida      ;Se invierte la hilera con el string del numero convertido
+
+
 	print newLine,longNewLine
 	print msjResultSuma,longMsjResultSuma
+    print resultSuma,longResultSuma  ;Se imprime el numero post conversion
+
+    ;Se reinicializa en cero con 100 bytes a la variable resultSuma
+    mov rbx,resultSuma
+    mov rcx,100
+    xor rax,rax
+    rep stosb 
+
 	;Se hace una pausa para que el usuario pueda apreciar el resultado 
 	print newLine,longNewLine 
     print newLine,longNewLine
@@ -182,6 +211,9 @@ _error:
     jmp _exit;Se salta a _exit para acabar el programa 
 
 _errorOverflow:
+    print newLine,longNewLine; 
+    print msjErrorOf,longMsjErrorOf
+    print newLine,longNewLine; 
 	jmp _exit
 
 _exit:;Se finaliza el programa

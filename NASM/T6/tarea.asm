@@ -110,7 +110,7 @@ section .text
 _start:
     print msj1,longMsj1
     input num1, longNum1
-        ;Se verifica si el primer numero ingresado es menor a 20 digitos 
+    ;Se verifica si el primer numero ingresado es menor a 20 digitos 
     mov rdi, num1   ;rdi es el parametro 
     call lenHilera  ;rax almacena el resultado
     cmp rax,20      ;En caso de ser mayor a 20 se salta al error
@@ -173,10 +173,10 @@ _start:
 
         print msjSuma,longMsjSuma
 
-        mov eax, [numSuma]  ;Se mueve a eax el numero a convertir de la suma
+        mov rax, [numSuma]  ;Se mueve a eax el numero a convertir de la suma
         mov rbx, r13
-        xor ecx,ecx         ;Se mueve a eax el numero a convertir de la diferencia
-        mov ecx, resultSuma ;Se almacena el resultado de la conversion en resultSuma
+        xor rcx,rcx         ;Se mueve a eax el numero a convertir de la diferencia
+        mov rcx, resultSuma ;Se almacena el resultado de la conversion en resultSuma
         call conversionBase    ;Se llama al procedure para convertir a la base actual en r13
 
         mov rsi, resultSuma ;rsi va como parametro 
