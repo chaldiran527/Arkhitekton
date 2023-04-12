@@ -1,3 +1,10 @@
+;===========================================================
+;Programa que realiza y valida las operaciones basicas de suma,resta,multiplicacion y division
+;Autores:
+;       Carlos Dario
+;       Juan Mallma 
+;===========================================================
+
 %include "Procs&macros.asm"
 
 section .data
