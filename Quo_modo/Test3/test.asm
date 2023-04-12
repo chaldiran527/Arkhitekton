@@ -1,4 +1,4 @@
-%include "aux.asm"
+%include "aux!.asm"
 
 section .data
 	msjMenu1 db 0xA,'Ingrese el numero de la operacion que desea realizar: ',0xA,0xA
