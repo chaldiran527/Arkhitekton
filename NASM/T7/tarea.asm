@@ -8,38 +8,38 @@
 
 	contarPalabras:
 		xor rcx,rcx ;Contador rcx se inicializa en cero 
-		cmp byte[rsi],10
-		je .finContarPalabras;Se verifica si el caracter es el newline del final
-
-		cmp byte[rsi],32
-		je .loopEspacios
-
-		inc rcx
-		jmp .loopPalabras
-
-	.loopPalabras:
-		inc rsi
-		;Se incrementa la posicion actual del registro de la palabra
-		cmp byte[rsi],10
+		cmp byte[rsi],10;Se verifica si el caracter es el newline del final
 		je .finContarPalabras
 
-		cmp byte[rsi],32
+		cmp byte[rsi],32;Se verifica si el caracter es espacio
 		je .loopEspacios
 
-		jmp .loopPalabras
+		inc rcx;Se incrementa el contador de palabras 
+		jmp .loopPalabras;Se salta al ciclo de contar palabra
+
+	.loopPalabras:
+		inc rsi;Se incrementa la posicion actual del registro de la palabra
+		cmp byte[rsi],10;Se verifica si el caracter es el newline del final
+		je .finContarPalabras
+
+		cmp byte[rsi],32;Se verifica si el caracter es espacio
+		je .loopEspacios
+
+		jmp .loopPalabras;Se salta de vuelta al label de palabras pues no se ha terminado de recorrer la palabra actual
 
 	.loopEspacios:
-		inc rsi
+		inc rsi;Se incrementa la posicion actual del registro de la palabra
+
 		cmp byte[rsi],10
 		je .finContarPalabras
 
 		cmp byte[rsi],32
 		je .loopEspacios
 		;
-		inc rcx
+		inc rcx;Se incrementa el contador de palabras 
 		jmp .loopPalabras
 
-	.finContarPalabras:
+	.finContarPalabras:;Se finaliza este procedimiento ya no hay mas caracteres que contar
 		ret
 
 
@@ -52,6 +52,8 @@ section .data
     longNewLine equ $ - newLine
     errorTexto db 'Error, el texto ingresado supera los 1024 caracteres!!!',0xA
     longErrorTexto equ $-errorTexto
+    msjNumPalabras db 'Cantidad de palabras: '
+    longMsjNumPalabras equ $-msjNumPalabras 
 
 section .bss
 	texto resb 100
@@ -69,6 +71,7 @@ section .text
 	global _start
 
 	_start:
+	;Se le pide al usuario ingresar el texto a evaluar
 		print msjIntro,longMsjIntro
 		print newLine,longNewLine
 		input texto,longTexto
@@ -82,6 +85,17 @@ section .text
 		call contarPalabras
 		mov [numPalabras],rcx
 
+	    mov rax, [numPalabras]           ;Se mueve a rax el numero a convertir de la multiplicacion
+	    mov rbx, 10
+	    xor rcx,rcx
+	    mov rcx, numPalabrasInt          ;Se almacena el resultado de la conversion e
+	    call conversionBase           ;Se llama al procedure para convertir a la base decimal 
+
+	    mov rsi, numPalabrasInt         ;rsi va como parametro 
+	    call hileraInvertida        ;Se invierte la hilera con el string del numero convertido
+	 	
+	 	print msjNumPalabras,longMsjNumPalabras 
+	 	print numPalabrasInt,longNumPalabrasInt
 
 		jmp _exit
 
