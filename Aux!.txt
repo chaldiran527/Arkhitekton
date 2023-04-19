@@ -365,3 +365,48 @@ _start:
     mov eax, 1
     xor ebx, ebx
     int 0x80
+
+;========
+.section .data
+msjMenu1:    .ascii 0xA "Ingrese el numero de la operacion que desea realizar: ", 0xA, 0xA
+longMsjMenu1 = . - msjMenu1
+msjMenu2:    .ascii "1.Suma 2.Resta 3.Multiplicacion 4.Division 5.Salir del programa  ", 0xA, 0xA
+longMsjMenu2 = . - msjMenu2
+msjNum1:     .ascii "Ingrese el primer numero: "
+longMsjNum1 = . - msjNum1
+msjNum2:     .ascii 0xA "Ingrese el segundo numero: "
+longMsjNum2 = . - msjNum2
+newLine:     .ascii 0xA ; Nuevalinea para separar las hileras a mostrar en la consola
+longNewLine = . - newLine
+msjSuma:     .ascii "   Suma: ", 0
+longMsjSuma = . - msjSuma
+msjBase:     .ascii "Base ", 0
+longMsjBase = . - msjBase
+msjBase2:    .ascii "Base 2 ", 0
+longMsjBase2 = . - msjBase2
+msjBase8:    .ascii "Base 8 ", 0
+longMsjBase8 = . - msjBase8
+msjBase16:   .ascii "Base 16 ", 0
+longMsjBase16 = . - msjBase16
+msjResta:    .ascii "   Resta: ", 0
+longMsjResta = . - msjResta
+msjError:    .ascii 0xA "ERROR: Usted acaba de ingresar un numero invalido!", 0xA
+longMsjError = . - msjError
+msjErrorOf:  .ascii "ERROR: Resultado de la suma supera los 64 bits, hay overflow!", 0
+longMsjErrorOf = . - msjErrorOf
+msjErrorInput: .ascii "ERROR: Usted ingreso una opcion invalida, intente nuevamente y seleccione un digito del 1 al 5 segun corresponda", 0
+longMsjErrorInput = . - msjErrorInput
+msjContinuacion: .ascii "Digite 1 si desea intentar ingresar nuevamente el numero   "
+longMsjContinuacion = . - msjContinuacion
+msjSalida:   .ascii "Digite cualquier otra tecla si desea terminar el programa-> ", 0
+longMsjSalida = . - msjSalida
+signoNeg:    .ascii "-", 0
+longSignoNeg = . - signoNeg
+msjResultSuma: .ascii "Resultado de la suma: ", 0
+longMsjResultSuma = . - msjResultSuma
+msjResultResta: .ascii "Resultado de la resta: ", 0
+longMsjResultResta = . - msjResultResta
+msjResultMul: .ascii "Resultado de la multiplicacion: ", 0
+longMsjResultMul = . - msjResultMul
+msjResultDiv: .ascii "Resultado de la division: ", 0
+longMsjResultDiv = . - msjResultDiv
