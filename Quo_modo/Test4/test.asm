@@ -1,5 +1,5 @@
 ;===========================================================
-;Programa que cuenta la cantidad de palabras de un texto ingreado por el usuario
+;Programa que cuenta y ordena las palabras de un texto ingreado por el usuario
 ;Autores:
 ;       Carlos Dario
 ;       Juan Mallma 
@@ -39,32 +39,52 @@
 		inc rcx;Se incrementa el contador de palabras 
 		jmp .loopPalabras
 
+	.concatenarEspacio:
+	;llamar al insertion sort que ordena e imprime la palabra 
+		jmp .loopEspacios
+
+	.concatenarFin:
+	;llamar al insertion sort que ordena e imprime la palabra 
+		jmp .finContarPalabras
+
 	.finContarPalabras:;Se finaliza este procedimiento ya no hay mas caracteres que contar
 		ret
 
+	ordenarPalabra:
+	;r9: Iterador de la palabra a ordenar
+	;r11: Iterador de la segunda palabra que ya esta ordenada 
+		jmp .finOrdenarPalabra
+
+	.finOrdenarPalabra:
+	;Imprimir palabra 
+		ret 
+
+	InsertionSort:
+		cmp byte[rsi],10
+		jne .finInsertionSort
+
+		jmp InsertionSort
+
+	.finInsertionSort:
+		ret
 
 section .data
-	msjIntro db 'Ingrese un texto de menos de 1024 caracteres: ',0xA
+	msjIntro db 'Ingrese una palabra de menos de 2048 caracteres: ',0xA
 	longMsjIntro equ $-msjIntro
     msjError db 'Error!'
     longMsjError equ $-msjError
     newLine db 0xA;Nuevalinea para separar las hileras a mostrar en la consola
     longNewLine equ $ - newLine
-    errorTexto db 'Error, el texto ingresado supera los 1024 caracteres!!!',0xA
+    errorTexto db 'Error, el texto ingresado supera los 2048 caracteres!!!',0xA
     longErrorTexto equ $-errorTexto
-    msjNumPalabras db 'Cantidad de palabras del archivo de texto: '
+    msjNumPalabras db 'Cantidad de palabras: '
     longMsjNumPalabras equ $-msjNumPalabras 
-    archivo db 'archivo.txt',0
-    msjIntroArchivo db 'Texto del archivo: ',0
-    longMsjIntroArchivo equ $-msjIntroArchivo
-    msjNumPalabrasIn db 'Cantidad de palabras ingresadas por el usuario: ',0
-    longMsjNumPalabrasIn equ $-msjNumPalabrasIn
+    palabrota db 'caras',0xA
+    longPalabrota equ $-palabrota
 
 section .bss
 	texto resb 100
 	longTexto equ $-texto
-	archivoTexto resb 100
-	longArchivoTexto equ $-archivoTexto
 	caracter resb 100
     longCaracter equ $-caracter
     prueba resb 100
@@ -73,82 +93,28 @@ section .bss
     longNumPalabras equ $-numPalabras 
     numPalabrasInt resb 100
     longNumPalabrasInt equ $-numPalabrasInt
+    palabra resb 100
+    longPalabra equ $-palabra
+    palabraNueva resb 100
+    longPalabraNueva equ $-palabraNueva
 
 section .text
 	global _start
 
 	_start:
+		;from down here use tarea T6 code asInt
+		input palabra,longPalabra
+		mov rbx,palabra 
+		xor rbp,rbp;palabra ordenada 
+		;mov 
+		inc rbx
+	_is:
+	
+		cmp byte[rbx],10
+		jne _exit
 
-;Se abre el archivo de texto a leer
-		mov rax,5
-		mov rbx,archivo
-		mov rcx,'r';Modo de lectura
-		int 0x80
 
-		mov rbx,rax
-
-		;Se leen los contenidos del archivo
-		mov rax,3
-		mov rcx,archivoTexto
-		mov rdx,longArchivoTexto
-		mov rbx,rax
-		int 0x80
-
-;Se verifica que el archivo de texto sea menor que 1024 caracteres
-
-		mov rdi,archivoTexto
-		call lenHilera
-		cmp rax,1024
-		ja _error
-
-		print newLine,longNewLine
-		print msjIntroArchivo,longMsjIntroArchivo
-		print archivoTexto,longArchivoTexto
-
-		mov rsi,archivoTexto
-		call contarPalabras
-		mov [numPalabras],rcx
-
-	    mov rax, [numPalabras]           ;Se mueve a rax el numero a convertir de la multiplicacion
-	    mov rbx, 10
-	    xor rcx,rcx
-	    mov rcx, numPalabrasInt          ;Se almacena el resultado de la conversion e
-	    call conversionBase           ;Se llama al procedure para convertir a la base decimal 
-
-	    mov rsi, numPalabrasInt         ;rsi va como parametro 
-	    call hileraInvertida        ;Se invierte la hilera con el string del numero convertido
-	 	
-	 	print msjNumPalabras,longMsjNumPalabras 
-	 	print numPalabrasInt,longNumPalabrasInt
-
-	;Se le pide al usuario ingresar el texto a evaluar
-	 	print newLine,longNewLine
-	 	print newLine,longNewLine
-		print msjIntro,longMsjIntro
-		print newLine,longNewLine
-		input texto,longTexto
-
-		mov rdi,texto
-		call lenHilera
-		cmp rax,1024
-		ja _error
-
-		mov rsi,texto
-		call contarPalabras
-		mov [numPalabras],rcx
-
-	    mov rax, [numPalabras]           ;Se mueve a rax el numero a convertir de la multiplicacion
-	    mov rbx, 10
-	    xor rcx,rcx
-	    mov rcx, numPalabrasInt          ;Se almacena el resultado de la conversion e
-	    call conversionBase           ;Se llama al procedure para convertir a la base decimal 
-
-	    mov rsi, numPalabrasInt         ;rsi va como parametro 
-	    call hileraInvertida        ;Se invierte la hilera con el string del numero convertido
-	 	
-	 	print msjNumPalabrasIn ,longMsjNumPalabrasIn
-	 	print numPalabrasInt,longNumPalabrasInt
-
+	_fis:
 		jmp _exit
 
 
