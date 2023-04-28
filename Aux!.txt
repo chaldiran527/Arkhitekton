@@ -410,3 +410,95 @@ msjResultMul: .ascii "Resultado de la multiplicacion: ", 0
 longMsjResultMul = . - msjResultMul
 msjResultDiv: .ascii "Resultado de la division: ", 0
 longMsjResultDiv = . - msjResultDiv
+
+
+
+;=======
+section .data
+    msg db 'car me lo ',0
+    msglen equ $ - msg
+
+section .bss
+    sorted_msg resb 100
+    sorted_len resb 1
+
+section .text
+    global _start
+
+_insertion_sort:
+    ; sort words in the string
+    mov rsi, msg
+    mov rdi, sorted_msg
+    mov ecx, 0
+
+.loop:
+    ; find the next word in the string
+    cmp byte [rsi], 0
+    je .done
+    cmp byte [rsi], ' '
+    jne .in_word
+    jmp .skip
+
+.in_word:
+    ; copy the word into the sorted string
+    mov al, [rsi]
+    mov [rdi], al
+    inc rsi
+    inc rdi
+    inc ecx
+
+    ; move the word into its proper position in the sorted string
+    cmp ecx, 1
+    jle .skip
+    mov bl, byte [rdi-2]
+    mov bh, byte [rdi-1]
+    cmp bl, bh
+    jbe .skip
+
+.swap:
+    mov byte [rdi-2], bh
+    mov byte [rdi-1], bl
+    dec rdi
+    dec ecx
+    cmp ecx, 1
+    jle .skip
+    mov bl, byte [rdi-2]
+    mov bh, byte [rdi-1]
+    cmp bl, bh
+    ja .swap
+
+.skip:
+    cmp byte [rsi], 0
+    je .done
+    inc rsi
+    jmp .loop
+
+.done:
+    ; null-terminate the sorted string
+    mov byte [rdi], 0
+    ; store the length of the sorted string
+    mov byte [sorted_len], cl
+    ret
+
+_start:
+    ; print the original string
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, msg
+    mov edx, msglen
+    int 0x80
+
+    ; sort the words in the string
+    call _insertion_sort
+
+    ; print the sorted string
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, sorted_msg
+    mov edx, byte [sorted_len]
+    int 0x80
+
+    ; exit the program
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
