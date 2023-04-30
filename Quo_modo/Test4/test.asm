@@ -7,69 +7,53 @@
 %include "Procs&macros.asm"
 
 	contarPalabras:
-		xor rcx,rcx ;Contador rcx se inicializa en cero 
-		cmp byte[rsi],10;Se verifica si el caracter es el newline del final
+		xor rcx, rcx
+		cmp byte [rsi],10
 		je .finContarPalabras
-
-		cmp byte[rsi],32;Se verifica si el caracter es espacio
-		je .loopEspacios
-
-		inc rcx;Se incrementa el contador de palabras 
-		jmp .loopPalabras;Se salta al ciclo de contar palabra
-
-	.loopPalabras:
-		inc rsi;Se incrementa la posicion actual del registro de la palabra
-		cmp byte[rsi],10;Se verifica si el caracter es el newline del final
-		je .finContarPalabras
-
-		cmp byte[rsi],32;Se verifica si el caracter es espacio
-		je .loopEspacios
-
-		jmp .loopPalabras;Se salta de vuelta al label de palabras pues no se ha terminado de recorrer la palabra actual
-
-	.loopEspacios:
-		inc rsi;Se incrementa la posicion actual del registro de la palabra
-
-		cmp byte[rsi],10
-		je .finContarPalabras
-
 		cmp byte[rsi],32
 		je .loopEspacios
-		;
-		inc rcx;Se incrementa el contador de palabras 
-		jmp .loopPalabras
+		inc rcx
 
-	.concatenarEspacio:
-	;llamar al insertion sort que ordena e imprime la palabra 
-		jmp .loopEspacios
-
-	.concatenarFin:
-	;llamar al insertion sort que ordena e imprime la palabra 
-		jmp .finContarPalabras
-
-	.finContarPalabras:;Se finaliza este procedimiento ya no hay mas caracteres que contar
-		ret
-
-	ordenarPalabra:
-	;r9: Iterador de la palabra a ordenar
-	;r11: Iterador de la segunda palabra que ya esta ordenada 
-		jmp .finOrdenarPalabra
-
-	.finOrdenarPalabra:
-	;Imprimir palabra 
-		ret 
-
-	InsertionSort:
+	.loopPalabras:
+		mov rdi, rsi 
+	.loopPalabras2:
+		inc rsi 
 		cmp byte[rsi],10
-		jne .finInsertionSort
+		je .finContarPalabras
+		cmp byte[rsi],32
+		jne .loopPalabras2
+		;Se ordena usando selection sort
+		mov rdx, rsi
 
-		jmp InsertionSort
+	.loopSelectionSort:
+		mov rax,rdi
 
-	.finInsertionSort:
+	.loopSelectionSort2:
+		inc rax
+		cmp rax, rdx
+		jge .loopPalabras
+		mov bl, byte[rax]
+		mov cl, byte[rdi]
+		cmp cl, bl
+		jle .loopSelectionSort2
+		mov byte[rax-1],cl
+		mov byte[rdi],bl
+		jmp .loopSelectionSort
+
+	.loopEspacios:
+		inc rsi
+		cmp byte[rsi], 10
+		je .finContarPalabras
+		cmp byte[rsi], 32
+		je .loopEspacios
+
+		inc rcx
+		jmp .loopPalabras
+	.finContarPalabras:
 		ret
 
 section .data
-	msjIntro db 'Ingrese una palabra de menos de 2048 caracteres: ',0xA
+	msjIntro db 'Ingrese un texto de menos de 2048 caracteres: ',0xA
 	longMsjIntro equ $-msjIntro
     msjError db 'Error!'
     longMsjError equ $-msjError
@@ -97,24 +81,47 @@ section .bss
     longPalabra equ $-palabra
     palabraNueva resb 100
     longPalabraNueva equ $-palabraNueva
+    textoOrdenado resb 100
+    longTextoOrdenado equ $-textoOrdenado
 
 section .text
 	global _start
 
 	_start:
-		;from down here use tarea T6 code asInt
-		input palabra,longPalabra
-		mov rbx,palabra 
-		xor rbp,rbp;palabra ordenada 
-		;mov 
-		inc rbx
-	_is:
-	
-		cmp byte[rbx],10
-		jne _exit
 
+	;Se le pide al usuario ingresar el texto a evaluar
+	 	print newLine,longNewLine
+	 	print newLine,longNewLine
+		print msjIntro,longMsjIntro
+		print newLine,longNewLine
+		input texto,longTexto
 
-	_fis:
+		mov rdi,texto
+		call lenHilera
+		cmp rax,1024
+		ja _error
+
+		mov rsi,texto
+		call contarPalabras
+		mov [textoOrdenado],rsi
+		print textoOrdenado,longTextoOrdenado
+		print newLine,longNewLine
+		print textoOrdenado,longTextoOrdenado
+		print newLine,longNewLine
+		mov [numPalabras],rcx
+
+	    mov rax, [numPalabras]           ;Se mueve a rax el numero a convertir de la multiplicacion
+	    mov rbx, 10
+	    xor rcx,rcx
+	    mov rcx, numPalabrasInt          ;Se almacena el resultado de la conversion e
+	    call conversionBase           ;Se llama al procedure para convertir a la base decimal 
+
+	    mov rsi, numPalabrasInt         ;rsi va como parametro 
+	    call hileraInvertida        ;Se invierte la hilera con el string del numero convertido
+	 	
+	 	print msjNumPalabras ,longMsjNumPalabras
+	 	print numPalabrasInt,longNumPalabrasInt
+
 		jmp _exit
 
 
