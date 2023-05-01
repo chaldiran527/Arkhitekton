@@ -531,7 +531,6 @@ _errorNum2:
 _exit:;Se finaliza el programa
     print newLine,longNewLine; Se imprime una nuevalinea para permitir ver bien el texto anterior en la consola
 
-
     ;Llamada de salida
     mov rbx,0           ;RBX=codigo de salido al 80 
     mov rax,1           ;RAX=funcion sys_exit() del kernel llama al sistema 

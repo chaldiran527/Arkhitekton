@@ -265,3 +265,8 @@
     .finHileraInvertida:;Se finaliza el procedimiento 
         ret
 
+;No se usa en este programa 
+_errorOverflow:
+    print msjError,longMsjError 
+    print newLine, longNewLine
+    jmp _exit 
