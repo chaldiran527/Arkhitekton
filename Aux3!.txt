@@ -1,0 +1,77 @@
+section .data
+input db "quick brown fox jumps over the lazy dog", 0
+output db 80 dup(0) ; Allocate space for the sorted string
+len equ $ - output ; Compute the length of the output string
+
+section .text
+global _start
+
+_start:
+  ; Initialize variables
+  mov ecx, len
+  mov esi, input
+  mov edi, output
+  
+  ; Loop through each word in the input string
+next_word:
+  mov al, byte [esi] ; Load the first character of the word
+  cmp al, 0 ; Check if we've reached the end of the string
+  je done
+  inc esi ; Move to the next character
+  mov ebx, esi ; Save the starting address of the word
+  
+  ; Find the end of the word
+find_end:
+  mov al, byte [esi] ; Load the current character
+  cmp al, ' ' ; Check if it's a space
+  jne not_end ; If not, keep going
+  mov byte [esi], 0 ; Terminate the word
+  call sort_word ; Sort the current word
+  mov byte [esi], ' ' ; Restore the space
+not_end:
+  inc esi ; Move to the next character
+  cmp esi, len ; Check if we've reached the end of the string
+  jb find_end ; If not, keep going
+  
+  ; Copy the sorted string to the output buffer
+  mov esi, input
+  mov edi, output
+  mov ecx, len
+  rep movsb
+  
+done:
+  ; Exit the program
+  mov eax, 1
+  xor ebx, ebx
+  int 0x80
+  
+sort_word:
+  ; Bubble sort the characters in the current word
+  push ebp
+  mov ebp, esp
+  mov edx, [ebp+8] ; Load the address of the word
+  xor ecx, ecx ; Initialize the loop counter
+outer_loop:
+  mov esi, edx ; Initialize the inner loop pointer
+  add esi, ecx
+  xor ebx, ebx ; Initialize the swap flag
+inner_loop:
+  mov al, byte [esi] ; Load the current character
+  cmp al, 0 ; Check if we've reached the end of the string
+  je end_inner_loop
+  mov dl, byte [esi+1] ; Load the next character
+  cmp dl, 0 ; Check if we've reached the end of the string
+  je end_inner_loop
+  cmp al, dl ; Compare the characters
+  jle not_swap ; If the current character is less than or equal to the next one, skip the swap
+  mov byte [esi], dl ; Swap the characters
+  mov byte [esi+1], al
+  mov ebx, 1 ; Set the swap flag
+not_swap:
+  add esi, 1 ; Move to the next character
+  jmp inner_loop
+end_inner_loop:
+  test ebx, ebx ; Check if a swap was made
+  jne outer_loop ; If so, repeat the outer loop
+  pop ebp
+  ret
