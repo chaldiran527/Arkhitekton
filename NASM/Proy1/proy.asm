@@ -6,29 +6,7 @@
 ;===========================================================
 
 %include "Procs&macros.asm"
-
-;Se verifica que la expresion no tenga errores sintacticos matematicos
-verificarExpresion:
-    jmp .finVerificarExpresion
-
-.finVerificarExpresion:
-    ret 
-
-;Se convierte el registro rsi del string a posfijo
-conversionPosfija:
-    jmp .finConversionPosfija
-
-.finConversionPosfija:
-    ret
-
-
-;Se evalua y opera el stack con los operaciones de la expresion posfija 
-evaluarPosfija:
-    jmp .finEvaluarPosfija
-
-.finEvaluarPosfija:
-    ret
-
+;%include "io.inc"
 
 section .data
 	msjMenu1 db 0xA,'Ingrese la expresion matematica a evaluar con los operandos + - * / ( ): ',0xA,0xA
@@ -81,6 +59,8 @@ section .bss
     longInput2 equ $-input2
     caracter resb 100
     longCaracter equ $-caracter
+    resultado resb 100
+    longResultado equ $-resultado
     result1 resb 100
     lenResult1 equ $-result1
     result2 resb 100
@@ -93,6 +73,8 @@ section .bss
     longResultMul equ $-resultMul
     resultDiv resb 100
     longResultDiv equ $-resultDiv
+    num resb 100
+    longNum equ $-num
     num1 resb 100
     longNum1 equ $-num1
     num2 resb 100
@@ -118,12 +100,153 @@ section .bss
 ;numDiv almacena la division de los dos numeros ingresados
 	numDiv resb 100
 	longNumDiv equ $-numDiv
+    expr resb 100
+    longExpr equ $-expr
+    negative resb 1
 
 section .text
 	global _start
 
 _start:
 	;Se muestran los mensajes del menu del programa
+ ;   mov ebp, esp; for correct debugging
+ ;   push rbp
+ ;   mov ebp, esp
+
+ ;   GET_STRING expr, MAX_INPUT_SIZE
+ 
+    input expr, longExpr
+
+    xor eax, eax
+    xor ebx, ebx
+    xor ecx, ecx
+    xor edx, edx
+    jmp read
+
+read:
+    
+    cmp byte[expr + ecx], 10        ; checks if the string terminator is reached
+    je stop
+
+    cmp byte[expr + ecx], '+'      ; checks if an addition must be performed
+    je addition
+
+    cmp byte[expr + ecx], '-'      ; checks if a subtraction must be performed
+    je subtraction
+
+    cmp byte[expr + ecx], '*'      ; checks if a multiplication must be performed
+    je multiplication
+    
+    cmp byte[expr + ecx], '/'      ; checks if a division must be performed
+    je division
+    
+    cmp byte[expr + ecx], ' '      ; if no operation should be performed
+    je stop                ; and if the current character is not
+                                   ; a space, a number is read
+    print signoNeg,longSignoNeg
+    ;jmp get_number
+
+resume:
+    inc ecx
+    jmp read                      ; continues the loop
+
+check_number:
+    cmp byte [negative], 1         ; checks if a number is negative
+    jz compute_negative_number
+
+push_number:
+    push rax                       ; pushes the number into the stack
+    xor edx, edx
+    xor eax, eax
+    jmp resume                     ; resumes reading the expression
+
+compute_negative_number:
+    mov byte[negative], 0
+    not eax                        ; computes the two's complement
+    inc eax                        ; of the negative number
+    jmp push_number
+                
+get_number:
+    ;print signoNeg,longSignoNeg
+    mov ebx, 10                    ; multiplies the current number
+    mul ebx                        ; by 10
+    mov bl, byte[expr + ecx]       ; converts the string character
+    sub bl, '0'                    ; to a digit
+    add eax, ebx                   ; adds the current digit to the number
+        
+    inc ecx
+        
+    cmp byte[expr + ecx], ' '      ; checks if the number has been read
+    jz check_number
+        
+    jmp get_number                 ; keeps reading the number
+
+get_negative_number:
+    mov byte [negative], 1         ; remembers if the number is negative
+    inc ecx
+    jmp get_number                 ; reads the number from the MSD to the LSD
+                
+addition:
+    pop rbx                        ; pops the operands from the stack
+    pop rax
+    add eax, ebx                   ; does the addition
+    push rax                       ; pushes the sum into the stack
+    xor eax, eax
+    jmp resume                     ; resumes reading the expression
+
+subtraction:
+    cmp byte[expr + ecx + 1], ' '  ; checks if it is an operand or the sign
+    jg get_negative_number         ; of a number
+
+    pop rbx                        ; pops the operands from the stack
+    pop rax
+    sub eax, ebx                   ; does the subtraction
+    push rax                       ; pushes the result into the stack
+    xor eax, eax
+    jmp resume                     ; resumes reading the expression
+
+multiplication:
+    pop rbx                        ; pops the operands from the stack
+    pop rax
+    imul ebx                       ; does the multiplication
+    push rax                       ; pushes the product into the stack
+    xor eax, eax
+    jmp resume                     ; resumes reading the expression
+
+division:
+    pop rbx                        ; pops the operands from the stack
+    pop rax
+    cdq
+    idiv ebx                       ; does the division
+    push rax                       ; pushes the quotient into the stack
+    xor eax, eax
+    jmp resume                     ; resumes reading the expression
+
+stop:
+    pop rax                        ; pops the result from the stack
+;    PRINT_DEC 4, eax               ; prints the result
+    mov [num],rax
+    mov rax, [num]  ;Se mueve a rax el numero a convertir de la suma
+    mov rbx, 10
+    xor rcx,rcx         ;Se mueve a rax el numero a convertir de la diferencia
+    mov rcx, resultado ;Se almacena el resultado de la conversion en resultSuma
+    call conversionBase    ;Se llama al procedure para convertir a la base decimal
+
+    mov rsi, resultado    ;rsi va como parametro 
+    call hileraInvertida      ;Se invierte la hilera con el string del numero convertido
+
+
+    print newLine,longNewLine
+
+    ;Se imprime el resultado de la suma
+    print resultado,longResultado  ;Se imprime el numero post conversion
+
+
+    xor eax, eax
+    pop rbp
+    ;ret
+
+    jmp _exit
 	print msjMenu1,longMsjMenu1
     
 	;Se recibe el input de la expresion ingresada por el usuario 

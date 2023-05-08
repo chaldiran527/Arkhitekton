@@ -153,7 +153,7 @@ _start:
     mov rcx,'r';Modo de lectura
     int 0x80
 
-    mov rbx,rax
+    mov rbx,rax   
 
     ;Se leen los contenidos del archivo
     mov rax,3
