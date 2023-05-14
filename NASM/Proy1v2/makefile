@@ -11,7 +11,7 @@
 # YASM firs to run this makefile withot problems.
 #*************************************************
 #change the name "ejemplo" for the name of your source file
-name=programa
+name=aux!
 #program to use as the assembler (you could use NASM or YASM for this makefile)
 ASM=nasm
 #flags for the assember
