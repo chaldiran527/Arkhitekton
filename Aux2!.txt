@@ -13,8 +13,10 @@ CMAIN:
 	push ebp
 	mov ebp, esp
 
-	GET_STRING expr, MAX_INPUT_SIZE
-      
+;	GET_STRING expr, MAX_INPUT_SIZE
+ 
+	input expr, longExpr
+
 	xor eax, eax
 	xor ebx, ebx
 	xor ecx, ecx
@@ -117,8 +119,71 @@ division:
 
 stop:
 	pop eax                        ; pops the result from the stack
-	PRINT_DEC 4, eax               ; prints the result
+	;PRINT_DEC 4, eax               ; prints the result
 	xor eax, eax
 	pop ebp
 	ret
 
+
+;;;;;;;;;;;;;;;;;;;;;;
+
+
+section .data
+    input_string db 'x + 3, x=21', 0
+    output_string db 100 dup(0) ; Buffer to store the modified string
+    longOut equ $-output_string
+section .text
+    global _start
+    
+_start:
+    ; Find the length of the input string
+    mov ecx, 0
+    mov esi, input_string
+    find_length:
+        cmp byte [esi + ecx], 0
+        jz modify_string
+        inc ecx
+        jmp find_length
+    
+    ; Modify the string
+    modify_string:
+        mov edi, output_string
+        mov ebx, ecx ; Store the length of the input string
+        
+        ; Find the position of the first comma
+        mov ecx, 0
+        find_comma:
+            cmp byte [esi + ecx], ','
+            jz copy_value
+            inc ecx
+            jmp find_comma
+        
+        ; Find the position of the equals sign
+        mov ecx, 0
+        find_equals:
+            cmp byte [esi + ecx], '='
+            jz copy_value
+            inc ecx
+            jmp find_equals
+        
+        ; Copy the value after the equals sign to the buffer
+        copy_value:
+            add ecx, 1 ; Move ecx to the character after the equals sign
+            mov edx, ebx
+            sub edx, ecx
+            mov ecx, edx
+            rep movsb
+            
+    ; Print the modified string
+    ;mov eax, 4
+    ;mov ebx, 1
+    ;mov edx, ebx
+    ;lea ecx, [output_string]
+    ;int 0x80
+    
+
+    print output_string,longOut
+    ; Exit the program
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80

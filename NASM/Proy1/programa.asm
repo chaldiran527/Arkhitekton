@@ -16,11 +16,11 @@ section .data
 	longMsjMenu1 equ $-msjMenu1
     newLine db 0xA;Nuevalinea para separar las hileras a mostrar en la consola
     longNewLine equ $ - newLine
-    msjError db 0xA,'ERROR: Usted acaba de ingresar un numero invalido!',0xA
+    msjError db 0xA,'ERROR: Usted acaba de ingresar una variable invalida!',0xA
     longMsjError equ $ - msjError
     msjErrorOf db 'ERROR: Resultado de la suma supera los 64 bits, hay overflow!',0
     longMsjErrorOf equ $-msjErrorOf
-    msjErrorInput db 'ERROR: Usted ingreso una opcion invalida, intente nuevamente.!',0
+    msjErrorInput db 'ERROR: Usted ingreso una expresion mayor a 1024 caracters invalida, intente nuevamente.!',0
     longMsjErrorInput equ $-msjErrorInput
     msjContinuacion db 'Digite 1 si desea ejecutar el programa nuevamente',0
     longMsjContinuacion equ $-msjContinuacion
@@ -34,23 +34,14 @@ section .data
     longMsjResult equ $-msjResult
     msj1 db 'Ingrese la expresion matematica a evaluar: '
     longMsj1 equ $-msj1
-    ;expr db '5 4 2 + * 8 2 / -',10
-;    posfijo db '-4 8 3 * +',10
-;    longPosfijo equ $-posfijo
-    pila    db 20 dup(0)     ;Pila para almacenar las variables
     ptrPila      db 0            
-;    input1 db '2 + 3',10
-;    longInput1 equ $-input1 
-   
-
 
 section .bss
+    pila resb 20
 	input1 resb 100
 	longInput1 equ $-input1
     input2 resb 10
     longInput2 equ $-input2
-;   expr resb 100 
-;   longExpr equ $-expr
     posfijo resb 100 
     longPosfijo equ $-posfijo
     caracter resb 100
@@ -65,18 +56,29 @@ section .bss
 section .text
 	global _start
 
+obtenerExpresion:
+    jmp .finObtenerExpresion
+
+.finObtenerExpresion:
+    ret 
+
 _start:
 	;Se muestran los mensajes del menu del programa
     print newLine,longNewLine 
     print msjMenu1,longMsjMenu1
-    ;print input1,longInput1 
-    ;
     input input1,longInput1
+    ;Se verifica si la expresion ingresada es menor a 1024 caracteres 
+    mov rdi, input1   ;rdi es el parametro 
+    call lenHilera  ;rax almacena el resultado
+    cmp rax,24      ;En caso de ser mayor a 1024 se salta al error
+    ja _errorInput
     jmp _conversionPosfijo 
 
 _conversionPosfijo:
     ;Se empieza iterando por todos los caracteres de la expresion ingresada
+    xor rax,rax 
     xor rcx,rcx         ;Se inicializa en cero al contador rcx para iterar
+    xor rbx,rbx 
     mov rsi, input1       ;se mueve a rsi la direccion de input1
 
 
@@ -85,7 +87,7 @@ _cicloInfijo:
     je _finCicloInfijo
     mov al, [rsi+rcx]     ;Se obtiene el caracter actual iterado por rcx
 ;Se verifica si es uno de los operadores + - * / ( ) 
-    cmp al, '+'           
+    cmp al, '+' 
     je _operador
     cmp al, '-'
     je _operador
@@ -184,14 +186,17 @@ _cicloFinInfijo:
     inc ebx ; Se incrementa el contador para iterar 
     dec byte [ptrPila] ; Se decrementa el puntero remove operator from stack
     cmp byte [ptrPila], 0 ; Se verifica si la pila esta vacia
-    jne _cicloFinInfijo ; ;no, continue
+    jne _cicloFinInfijo ; ;no, entonces continuar
 
 _finConversionPosfijo:
     ;Se agrega un 10 de newline para determinar el fin de la expresion posfija
     mov byte [posfijo+rbx], 10
     print msjPosfijo,longMsjPosfijo
     print posfijo,longPosfijo
+    ;jmp _exit 
     ;Se salta a evaluar la expresion en posfijo 
+    ;Cambios cambios cambios
+    ;jmp _exit 
     jmp _evaluarPosfijo
 
 _evaluarPosfijo:
@@ -401,16 +406,15 @@ _errorInput:;Seccion donde se indica un error correspondiente a la expresion ing
     print newLine,longNewLine
     print msjErrorInput,longMsjErrorInput
     print newLine,longNewLine
-    jmp _exit
+    ;Se reinicializa la variable input1 de la expresion
+    mov rbx,input1
+    mov rcx,100
+    xor rax,rax
+    rep stosb 
+    print newLine,longNewLine
+    jmp _start
 
-_errorOverflow:;En caso de que hubo un error relacionado a desbordamiento en la pila de memoria 
+_errorOverflow:;En caso de que hubo un error relacionado al desbordamiento en la pila de memoria 
     print newLine,longNewLine; 
     print msjErrorOf,longMsjErrorOf
     jmp _exit
-
-
-;    ;Se reinicializa en cero con 100 bytes a las variables ...
-;    mov rbx,resultMul
-;    mov rcx,100
-;    xor rax,rax
-;    rep stosb 

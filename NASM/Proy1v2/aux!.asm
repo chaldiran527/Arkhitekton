@@ -7,92 +7,78 @@
 
 ;Macros a ser usados en este programa 
 
-section .data
-    input db '2', 0 ; input infix expression
+;Macro para imprimir mensaje con 2 parametros(%1 de hilera,%2 de longitud de la hilera)
+    %macro print 2
+        mov rax, 4
+        mov rbx, 1
+        mov rcx, %1
+        mov rdx, %2
+        int 0x80
+    %endmacro
 
-section .bss
-    stack resb 100  ; stack for operators
-    output resb 100  ; output buffer for postfix expression
+section .data
+    input_string db '3 + x, x=21',0
+    output_string db '3 + ', 0
+    result_string db 16   ; Buffer to store the result as a string
+    result_length equ $-result_string   ; Length of the result string
 
 section .text
     global _start
 
 _start:
-    ; Initialize registers
-    mov ebx, input ; ebx points to the input string
-    mov ecx, output ; ecx points to the output buffer
-    mov edx, stack ; edx points to the stack
+    ; Find the position of 'x=' in the input string
+    mov esi, input_string
+    mov ecx, result_length
+    cld
+    repne scasb
+    jne exit_program
 
-    ; Call the conversion function
-    call infix_to_postfix
-
-    ; Terminate program
-    mov eax, 1 ; exit system call
-    xor ebx, ebx ; return value
-    int 0x80 ; execute system call
-
-infix_to_postfix:
-    ; Initialize registers
-    xor eax, eax ; eax = 0 (stack pointer)
-    xor ebx, ebx ; ebx = 0 (output buffer pointer)
-
-    ; Loop through each character in the input string
-    .loop:
-        mov al, byte [ebx + input] ; load next character
-        cmp al, 0 ; end of string?
-        je .done
-
-        ; If character is a digit, copy it to output buffer
+    ; Skip 'x=' and extract the value of x
+    mov esi, ecx
+    xor eax, eax
+    mov ebx, 10    ; Base 10 for converting the ASCII value to decimal
+    extract_x:
+        lodsb
+        cmp al, 0
+        je exit_program
         cmp al, '0'
-        jb .operator
+        jb exit_program
         cmp al, '9'
-        ja .operator
-        mov byte [ecx + edx], al
-        inc edx
-        jmp .next
+        ja exit_program
+        sub al, '0'
+        mul ebx
+        add eax, edx
+        jmp extract_x
 
-    .operator:
-        ; If character is an operator, push it onto stack
-        cmp al, '('
-        je .push
-        cmp al, ')'
-        je .pop
-        mov byte [eax + edx], al
-        inc eax
-        jmp .next
+exit_program:
+    ; Convert the value of x to a string
+    add eax, '0'
+    mov ecx, result_length
+    mov edi, result_string
+    std
+    convert_to_string:
+        xor edx, edx
+        div ebx
+        add dl, '0'
+        dec ecx
+        mov [edi+ecx], dl
+        test eax, eax
+        jnz convert_to_string
 
-    .push:
-        mov byte [eax + edx], al
-        inc eax
-        jmp .next
+    ; Append the converted value of x to the output string
+    mov esi, output_string
+    mov ecx, result_length
+    mov edi, ecx
+    rep movsb
 
-    .pop:
-        dec eax
-        .pop_loop:
-            mov bl, byte [eax + edx]
-            cmp bl, '('
-            je .next
-            mov byte [ecx + edx], bl
-            inc edx
-            dec eax
-        jmp .pop_loop
+    ; Print the output string
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, output_string
+    mov edx, result_length
+    int 0x80
 
-    .next:
-        inc ebx
-        jmp .loop
-
-    .done:
-        ; Pop remaining operators from stack
-        .pop_remaining:
-            dec eax
-            cmp eax, -1
-            je .finish
-            mov bl, byte [eax + edx]
-            mov byte [ecx + edx], bl
-            inc edx
-            jmp .pop_remaining
-
-        .finish:
-            ; Null terminate output buffer
-            mov byte [ecx + edx], 0
-            ret
+    ; Exit the program
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
